@@ -1,0 +1,20 @@
+apiVersion: v1
+entries:
+  easy-tunnel-lb:
+  - apiVersion: v2
+    appVersion: alpha
+    created: "2024-12-23T19:07:04.332785718Z"
+    description: A WireGuard based k8s load balancer for airgapped clusters
+    digest: 63a37c8466ba70e78ec8cbff21f7f398e175162b3a5167f52881762bd244a7d2
+    keywords:
+    - tunnel
+    - loadbalancer
+    - networking
+    maintainers:
+    - name: quinnovator
+    name: easy-tunnel-lb
+    type: application
+    urls:
+    - https://quinnovator.github.io/easy-tunnel-lb/easy-tunnel-lb-0.1.0.tgz
+    version: 0.1.0
+generated: "2024-12-23T19:07:04.332347157Z"
