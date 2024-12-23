@@ -20,7 +20,7 @@ A Kubernetes controller that enables exposing cluster load balancer traffic thro
 
 ## Prerequisites
 
-- Kubernetes cluster (1.19+)
+- Kubernetes cluster (1.21+)
 - WireGuard tools installed on the cluster nodes
 - A VPS running the `easy-tunnel-lb-agent` server component
 - `kubectl` access to the cluster
@@ -119,4 +119,4 @@ go build -o bin/easy-tunnel-lb cmd/main.go
 
 ## License
 
-MIT License - see LICENSE file for details
+AGPL-v3
