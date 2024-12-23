@@ -1,4 +1,4 @@
-# easy-tunnel-lb
+# Easy Tunnel Load Balancer
 
 A Kubernetes controller that enables exposing cluster load balancer traffic through a VPS using WireGuard tunnels.
 
