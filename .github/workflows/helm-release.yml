@@ -41,17 +41,20 @@ jobs:
             git checkout --orphan gh-pages
             git rm -rf .
             git commit --allow-empty -m "Create gh-pages branch"
-            git push origin gh-pages
+            git push -f origin gh-pages
           fi
 
       - name: Generate Helm Repository
         run: |
+          git fetch origin gh-pages
           git checkout gh-pages
+          git reset --hard origin/gh-pages
+          rm -f *.tgz index.yaml
           cp .cr-release-packages/* .
           helm repo index . --url https://quinnovator.github.io/easy-tunnel-lb
           git add .
           git commit -m "Update Helm repository" || echo "No changes to commit"
-          git push origin gh-pages
+          git push -f origin gh-pages
 
       - name: Switch back to main
         run: |
