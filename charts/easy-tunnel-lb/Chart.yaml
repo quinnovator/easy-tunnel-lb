@@ -2,7 +2,7 @@ apiVersion: v2
 name: easy-tunnel-lb
 description: A WireGuard based k8s load balancer for airgapped clusters
 type: application
-version: 0.1.0-alpha
+version: 0.1.0
 appVersion: "alpha"
 maintainers:
   - name: "quinnovator"
