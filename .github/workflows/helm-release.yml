@@ -8,6 +8,11 @@ on:
       - 'charts/**'
       - '.github/workflows/helm-release.yml'
 
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
 jobs:
   release:
     runs-on: ubuntu-latest
@@ -25,12 +30,29 @@ jobs:
       - name: Install Helm
         uses: azure/setup-helm@v3
 
-      - name: Add Helm repos
+      - name: Package Helm Charts
         run: |
-          helm repo add stable https://charts.helm.sh/stable
-          helm repo update
+          mkdir .cr-release-packages
+          helm package charts/* --destination .cr-release-packages
 
-      - name: Run chart-releaser
-        uses: helm/chart-releaser-action@v1.5.0
-        env:
-          CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}" 
+      - name: Create gh-pages branch if not exists
+        run: |
+          if ! git rev-parse --verify gh-pages >/dev/null 2>&1; then
+            git checkout --orphan gh-pages
+            git rm -rf .
+            git commit --allow-empty -m "Create gh-pages branch"
+            git push origin gh-pages
+          fi
+
+      - name: Generate Helm Repository
+        run: |
+          git checkout gh-pages
+          cp .cr-release-packages/* .
+          helm repo index . --url https://quinnovator.github.io/easy-tunnel-lb
+          git add .
+          git commit -m "Update Helm repository" || echo "No changes to commit"
+          git push origin gh-pages
+
+      - name: Switch back to main
+        run: |
+          git checkout main 
