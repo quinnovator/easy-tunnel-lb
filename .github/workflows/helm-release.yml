@@ -32,7 +32,7 @@ jobs:
 
       - name: Package Helm Charts
         run: |
-          mkdir .cr-release-packages
+          mkdir -p .cr-release-packages
           helm package charts/* --destination .cr-release-packages
 
       - name: Create gh-pages branch if not exists
@@ -49,9 +49,15 @@ jobs:
           git fetch origin gh-pages
           git checkout gh-pages
           git reset --hard origin/gh-pages
+          # Remove old packages and index
           rm -f *.tgz index.yaml
-          cp .cr-release-packages/* .
+          # Copy new packages
+          cp .cr-release-packages/*.tgz .
+          # Remove the temporary directory to avoid duplicate entries
+          rm -rf .cr-release-packages
+          # Generate new index
           helm repo index . --url https://quinnovator.github.io/easy-tunnel-lb
+          # Commit and push
           git add .
           git commit -m "Update Helm repository" || echo "No changes to commit"
           git push -f origin gh-pages
