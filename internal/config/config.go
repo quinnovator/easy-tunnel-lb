@@ -15,10 +15,14 @@ type Config struct {
 // LoadConfig loads configuration from environment variables
 func LoadConfig() (*Config, error) {
 	config := &Config{
-		ServerURL:     getEnvOrDefault("SERVER_URL", "http://localhost:8080"),
+		ServerURL:     getEnvOrDefault("SERVER_URL", ""),
 		APIKey:        getEnvOrDefault("API_KEY", ""),
 		LogLevel:      getEnvOrDefault("LOG_LEVEL", "info"),
 		WatchInterval: 30, // Default 30 seconds
+	}
+
+	if config.ServerURL == "" {
+		return nil, ErrMissingServerURL
 	}
 
 	if config.APIKey == "" {
@@ -39,6 +43,7 @@ func getEnvOrDefault(key, defaultValue string) string {
 // Error types for configuration
 var (
 	ErrMissingAPIKey = ConfigError("API_KEY environment variable is required")
+	ErrMissingServerURL = ConfigError("SERVER_URL environment variable is required")
 )
 
 // ConfigError represents a configuration error

@@ -4,10 +4,10 @@ import (
 	"context"
 	"fmt"
 
-	networkingv1 "k8s.io/api/networking/v1"
+	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/watch"
-	"k8s.io/client-go/kubernetes"
+	kubernetes "k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 )
 
@@ -33,34 +33,50 @@ func NewClient() (*Client, error) {
 	}, nil
 }
 
-// GetIngress retrieves an Ingress resource
-func (c *Client) GetIngress(ctx context.Context, namespace, name string) (*networkingv1.Ingress, error) {
-	return c.clientset.NetworkingV1().Ingresses(namespace).Get(ctx, name, metav1.GetOptions{})
+// ListServices lists all Services in the given namespace. If namespace is "", it lists across all namespaces.
+func (c *Client) ListServices(ctx context.Context, namespace string, opts metav1.ListOptions) (*v1.ServiceList, error) {
+	return c.clientset.CoreV1().Services(namespace).List(ctx, opts)
 }
 
-// UpdateIngressStatus updates the status of an Ingress resource
-func (c *Client) UpdateIngressStatus(ctx context.Context, ingress *networkingv1.Ingress) error {
-	_, err := c.clientset.NetworkingV1().Ingresses(ingress.Namespace).UpdateStatus(ctx, ingress, metav1.UpdateOptions{})
+// WatchServices sets up a watch on Services in the given namespace. If namespace is "", it watches across all namespaces.
+func (c *Client) WatchServices(ctx context.Context, namespace string, opts metav1.ListOptions) (watch.Interface, error) {
+	return c.clientset.CoreV1().Services(namespace).Watch(ctx, opts)
+}
+
+// GetService retrieves a specific Service
+func (c *Client) GetService(ctx context.Context, namespace, name string) (*v1.Service, error) {
+	svc, err := c.clientset.CoreV1().Services(namespace).Get(ctx, name, metav1.GetOptions{})
+	if err != nil {
+		return nil, err
+	}
+	return svc, nil
+}
+
+// UpdateServiceStatus updates the status of the given Service
+func (c *Client) UpdateServiceStatus(ctx context.Context, svc *v1.Service) error {
+	_, err := c.clientset.CoreV1().Services(svc.Namespace).UpdateStatus(ctx, svc, metav1.UpdateOptions{})
 	return err
 }
 
-// ListIngresses lists all Ingress resources in a namespace
-func (c *Client) ListIngresses(ctx context.Context, namespace string) (*networkingv1.IngressList, error) {
-	return c.clientset.NetworkingV1().Ingresses(namespace).List(ctx, metav1.ListOptions{})
-}
+// SetServiceLoadBalancer updates the given Service's status.loadBalancer with an external IP or external hostname
+func (c *Client) SetServiceLoadBalancer(ctx context.Context, svc *v1.Service, externalIP, externalHost string) error {
+	loadBalancerIngress := []v1.LoadBalancerIngress{}
 
-// WatchIngresses returns a watcher for Ingress resources
-func (c *Client) WatchIngresses(ctx context.Context, namespace string) (watch.Interface, error) {
-	return c.clientset.NetworkingV1().Ingresses(namespace).Watch(ctx, metav1.ListOptions{})
-}
-
-// SetIngressLoadBalancer updates the Ingress status with load balancer information
-func (c *Client) SetIngressLoadBalancer(ctx context.Context, ingress *networkingv1.Ingress, hostname string) error {
-	ingress.Status.LoadBalancer.Ingress = []networkingv1.IngressLoadBalancerIngress{
-		{
-			Hostname: hostname,
-		},
+	if externalIP != "" {
+		loadBalancerIngress = append(loadBalancerIngress, v1.LoadBalancerIngress{
+			IP: externalIP,
+		})
 	}
-	
-	return c.UpdateIngressStatus(ctx, ingress)
+	if externalHost != "" {
+		loadBalancerIngress = append(loadBalancerIngress, v1.LoadBalancerIngress{
+			Hostname: externalHost,
+		})
+	}
+
+	svc.Status.LoadBalancer.Ingress = loadBalancerIngress
+
+	if err := c.UpdateServiceStatus(ctx, svc); err != nil {
+		return fmt.Errorf("failed to update service loadbalancer status: %w", err)
+	}
+	return nil
 } 

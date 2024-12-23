@@ -4,7 +4,7 @@ A Kubernetes controller that enables exposing cluster load balancer traffic thro
 
 ## Overview
 
-`easy-tunnel-lb` is a Kubernetes controller that watches for Ingress resources and creates secure tunnels to expose their traffic through a remote VPS. This is particularly useful when:
+`easy-tunnel-lb` is a Kubernetes controller that watches for Service resources of type LoadBalancer and creates secure tunnels to expose their traffic through a remote VPS. This is particularly useful when:
 
 - Running Kubernetes clusters in private networks
 - Need to expose services without a cloud load balancer
@@ -13,9 +13,9 @@ A Kubernetes controller that enables exposing cluster load balancer traffic thro
 ## Features
 
 - Automatic tunnel creation and management
-- Ingress-based configuration
+- Service-based configuration (LoadBalancer type)
 - WireGuard tunnel support
-- Automatic status updates for Ingress resources
+- Automatic status updates for Service resources
 - Secure API key authentication
 
 ## Prerequisites
@@ -59,35 +59,31 @@ helm upgrade easy-tunnel-lb easy-tunnel-lb/easy-tunnel-lb --namespace easy-tunne
 
 ## Usage
 
-1. Add the required annotation to your Ingress resource:
+1. Create a Service of type LoadBalancer with the required annotation:
 
 ```yaml
-apiVersion: networking.k8s.io/v1
-kind: Ingress
+apiVersion: v1
+kind: Service
 metadata:
   name: my-app
   annotations:
     easy-tunnel-lb.quinnovator.com/enabled: "true"
 spec:
-  rules:
-    - host: myapp.example.com
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: my-app
-                port:
-                  number: 80
+  type: LoadBalancer
+  ports:
+    - port: 80
+      targetPort: 80
+      protocol: TCP
+  selector:
+    app: my-app
 ```
 
 2. The controller will:
 
-    - Detect the annotated Ingress
+    - Detect the annotated Service
     - Request a tunnel from the server-side agent
     - Configure the local WireGuard tunnel
-    - Update the Ingress status with the external IP/hostname
+    - Update the Service status with the external IP/hostname
 
 ## Configuration
 
@@ -96,14 +92,14 @@ The controller can be configured using environment variables:
 - `SERVER_URL`: URL of the server-side agent (required)
 - `API_KEY`: API key for authentication (required)
 - `LOG_LEVEL`: Logging level (default: "info")
-- `WATCH_INTERVAL`: Interval for checking Ingress updates in seconds (default: 30)
+- `WATCH_INTERVAL`: Interval for checking Service updates in seconds (default: 30)
 
 ## RBAC Permissions
 
 The controller requires the following permissions:
 
-- List and watch Ingress resources
-- Update Ingress status
+- List and watch Service resources
+- Update Service status
 - Create and manage ConfigMaps (for tunnel state)
 
 See `deploy/rbac.yaml` for the complete RBAC configuration.

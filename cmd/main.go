@@ -40,10 +40,10 @@ func main() {
 	tunnelMgr := tunnel.NewManager()
 
 	// Create reconciler
-	reconciler := controller.NewReconciler(k8sClient, apiClient, tunnelMgr, logger)
+	reconciler := controller.NewServiceReconciler(k8sClient, apiClient, tunnelMgr, logger)
 
-	// Create ingress watcher
-	watcher := controller.NewIngressWatcher(k8sClient, reconciler, logger)
+	// Create service watcher
+	watcher := controller.NewServiceWatcher(k8sClient, reconciler, logger)
 
 	// Set up signal handling
 	ctx, cancel := context.WithCancel(context.Background())

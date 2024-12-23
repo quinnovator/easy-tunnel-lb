@@ -56,12 +56,6 @@ jobs:
             ghcr.io/quinnovator/easy-tunnel-lb:alpha
             ghcr.io/quinnovator/easy-tunnel-lb:${{ github.sha }}
 
-      - name: Build Release Binaries
-        run: |
-          GOOS=linux GOARCH=amd64 go build -o easy-tunnel-lb-linux-amd64 ./cmd
-          GOOS=darwin GOARCH=amd64 go build -o easy-tunnel-lb-darwin-amd64 ./cmd
-          GOOS=darwin GOARCH=arm64 go build -o easy-tunnel-lb-darwin-arm64 ./cmd
-
       - name: Generate Release Tag
         id: tag
         run: |
@@ -70,12 +64,9 @@ jobs:
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: ${{ steps.tag.outputs.tag_name }}
+          # tag_name: ${{ steps.tag.outputs.tag_name }}
+          tag_name: alpha
           name: Release ${{ steps.tag.outputs.tag_name }}
-          files: |
-            easy-tunnel-lb-linux-amd64
-            easy-tunnel-lb-darwin-amd64
-            easy-tunnel-lb-darwin-arm64
           draft: false
-          prerelease: false
+          prerelease: true
           generate_release_notes: true
