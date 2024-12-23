@@ -28,7 +28,11 @@ spec:
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
-            {{- toYaml .Values.securityContext | nindent 12 }}
+            capabilities:
+              add:
+                - NET_ADMIN
+                - NET_RAW
+            privileged: true
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
@@ -46,8 +50,14 @@ spec:
             httpGet:
               path: /health
               port: health
+          volumeMounts:
+            - name: wireguard-config
+              mountPath: /etc/wireguard
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+      volumes:
+        - name: wireguard-config
+          emptyDir: {}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
