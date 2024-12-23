@@ -45,6 +45,18 @@ helm install easy-tunnel-lb easy-tunnel-lb/easy-tunnel-lb \
   --set config.apiKey=your-api-key
 ```
 
+### Upgrading
+
+To upgrade to the latest version of the chart:
+
+```bash
+# Update the repository
+helm repo update
+
+# Upgrade the installation
+helm upgrade easy-tunnel-lb easy-tunnel-lb/easy-tunnel-lb --namespace easy-tunnel-lb-system
+```
+
 ## Usage
 
 1. Add the required annotation to your Ingress resource:

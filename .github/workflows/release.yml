@@ -30,6 +30,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      packages: write
 
     steps:
       - uses: actions/checkout@v3
@@ -39,6 +40,21 @@ jobs:
         with:
           go-version: "1.21"
           cache: true
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and Push Docker Image
+        uses: docker/build-push-action@v5
+        with:
+          push: true
+          tags: |
+            ghcr.io/quinnovator/easy-tunnel-lb:alpha
+            ghcr.io/quinnovator/easy-tunnel-lb:${{ github.sha }}
 
       - name: Build Release Binaries
         run: |
