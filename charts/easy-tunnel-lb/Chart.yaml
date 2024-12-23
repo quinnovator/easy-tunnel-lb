@@ -1,0 +1,12 @@
+apiVersion: v2
+name: easy-tunnel-lb
+description: A Helm chart for easy-tunnel-lb - A lightweight, easy-to-use tunnel load balancer
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+maintainers:
+  - name: "John Quinn"
+keywords:
+  - tunnel
+  - loadbalancer
+  - networking

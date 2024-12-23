@@ -27,6 +27,24 @@ A Kubernetes controller that enables exposing cluster load balancer traffic thro
 
 ## Installation
 
+### Using Helm (Recommended)
+
+1. Add the Helm repository:
+```bash
+helm repo add easy-tunnel-lb https://quinnovator.github.io/easy-tunnel-lb
+helm repo update
+```
+
+2. Install the chart:
+```bash
+helm install easy-tunnel-lb easy-tunnel-lb/easy-tunnel-lb \
+  --namespace easy-tunnel-lb-system \
+  --create-namespace \
+  --set config.apiKey=your-api-key
+```
+
+### Manual Installation
+
 1. Create a namespace for the controller:
 
 ```bash
