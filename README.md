@@ -30,45 +30,19 @@ A Kubernetes controller that enables exposing cluster load balancer traffic thro
 ### Using Helm (Recommended)
 
 1. Add the Helm repository:
+
 ```bash
 helm repo add easy-tunnel-lb https://quinnovator.github.io/easy-tunnel-lb
 helm repo update
 ```
 
 2. Install the chart:
+
 ```bash
 helm install easy-tunnel-lb easy-tunnel-lb/easy-tunnel-lb \
   --namespace easy-tunnel-lb-system \
   --create-namespace \
   --set config.apiKey=your-api-key
-```
-
-### Manual Installation
-
-1. Create a namespace for the controller:
-
-```bash
-kubectl create namespace easy-tunnel-lb-system
-```
-
-2. Create a secret with your API key:
-
-```bash
-kubectl create secret generic easy-tunnel-lb-config \
-  --namespace easy-tunnel-lb-system \
-  --from-literal=api-key=your-api-key
-```
-
-3. Apply the RBAC configuration:
-
-```bash
-kubectl apply -f deploy/rbac.yaml
-```
-
-4. Deploy the controller:
-
-```bash
-kubectl apply -f deploy/deployment.yaml
 ```
 
 ## Usage
@@ -97,10 +71,11 @@ spec:
 ```
 
 2. The controller will:
-   - Detect the annotated Ingress
-   - Request a tunnel from the server-side agent
-   - Configure the local WireGuard tunnel
-   - Update the Ingress status with the external IP/hostname
+
+    - Detect the annotated Ingress
+    - Request a tunnel from the server-side agent
+    - Configure the local WireGuard tunnel
+    - Update the Ingress status with the external IP/hostname
 
 ## Configuration
 
