@@ -42,9 +42,9 @@ jobs:
 
       - name: Build Release Binaries
         run: |
-          GOOS=linux GOARCH=amd64 go build -o easy-tunnel-lb-linux-amd64 ./cmd/easy-tunnel-lb
-          GOOS=darwin GOARCH=amd64 go build -o easy-tunnel-lb-darwin-amd64 ./cmd/easy-tunnel-lb
-          GOOS=darwin GOARCH=arm64 go build -o easy-tunnel-lb-darwin-arm64 ./cmd/easy-tunnel-lb
+          GOOS=linux GOARCH=amd64 go build -o easy-tunnel-lb-linux-amd64 ./cmd
+          GOOS=darwin GOARCH=amd64 go build -o easy-tunnel-lb-darwin-amd64 ./cmd
+          GOOS=darwin GOARCH=arm64 go build -o easy-tunnel-lb-darwin-arm64 ./cmd
 
       - name: Create Release
         uses: softprops/action-gh-release@v1
